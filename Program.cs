@@ -10,7 +10,8 @@ using Task4.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString(Environment.GetEnvironmentVariable("DefaultConnection")
+)));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -66,11 +67,17 @@ app.UseAuthentication();
 app.UseMiddleware<ActiveOnlyMiddleware>();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+//app.MapStaticAssets();
+
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Login}/{action=Index}/{id?}")
+//    .WithStaticAssets();
+app.UseStaticFiles(); // Habilita archivos estáticos en wwwroot
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Login}/{action=Index}/{id?}");
+
 
 app.Run();
