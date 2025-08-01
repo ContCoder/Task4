@@ -1,0 +1,121 @@
+﻿@{
+    Layout = null;
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="~/css/logincss.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Welcome!</h1>
+                <p>SignIn</p>
+            </div>
+
+            <div id="errorAlert" class="alert alert-danger" style="display: none;">
+                <span id="errorMessage"></span>
+            </div>
+
+            <div id="successAlert" class="alert-success" style="display: none;">
+                <span id="successMessage"></span>
+            </div>
+
+
+            <form id="loginForm" action="Login/SignIn" method="post" novalidate>
+
+                <div class="form-floating">
+                    <input type="email"
+                           class="form-control"
+                           id="email"
+                           name="Email"
+                           placeholder="example@gmail.com"
+                           required>
+                    <label for="email">Email</label>
+                </div>
+
+                <div class="form-floating password-field">
+                    <input type="password"
+                           class="form-control"
+                           id="password"
+                           name="Password"
+                           placeholder="Contraseña"
+                           required>
+                    <label for="password">Password</label>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-login">
+                    <span class="spinner-border spinner-border-sm me-2 loading" role="status" aria-hidden="true"></span>
+                    <span class="btn-text">
+                        Iniciar Sesión
+                    </span>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span></span>
+            </div>
+
+            <div class="signup-link">
+                <a href="/Login/SignUp" class="btn-link">
+                    SignUp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script>
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (errorAlert && errorMessage) {
+                errorMessage.textContent = message;
+                errorAlert.style.display = 'block';
+                errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function showSuccess(message) {
+            const successAlert = document.getElementById('successAlert');
+            const successMessage = document.getElementById('successMessage');
+
+            if (successAlert && successMessage) {
+                successMessage.textContent = message;
+                successAlert.style.display = 'block';
+                successAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <text>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showError('@ViewBag.ErrorMessage')
+                    });
+            </text>
+        }
+        @if (TempData["Message"] != null)
+        {
+            <text>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSuccess('@TempData["Message"]');
+                    });
+            </text>
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "dotnet",
+			"task": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build"
+		},
+		{
+			"type": "dotnet",
+			"task": "build D:\\ILearning\\Task4\\Task4\\Task4.csproj",
+			"file": "D:\\ILearning\\Task4\\Task4\\Task4.csproj",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build D:\\ILearning\\Task4\\Task4\\Task4.csproj"
+		}
+	]
+}

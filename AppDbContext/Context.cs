@@ -31,6 +31,9 @@ namespace Task4.AppDbContext
                 entity.HasOne(u => u.Role)
                       .WithMany()
                       .HasForeignKey(x => x.RoleId);
+
+                entity.ToTable(t => t.HasCheckConstraint("CK_User_Password_NotEmpty", "LEN(TRIM([Password])) > 0"));
+
             });
 
             //RoleModel configuration

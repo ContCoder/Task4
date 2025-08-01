@@ -2,7 +2,122 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+<div class="container mt-4">
+    <!-- Toolbar -->
+    <div class="d-flex justify-content-start align-items-center mb-3 gap-2">
+        <button class="btn btn-outline-primary" id="blockButton">Block</button>
+        <button class="btn btn-outline-success" id="unblockButton">Unblock</button>
+        <button class="btn btn-outline-danger" id="deleteButton">Delete</button>
+    </div>
+
+    <!-- Table -->
+    <table class="table table-striped table-bordered" id="userTable">
+        <thead class="table-light">
+            <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Blocked</th>
+                <th>Last seen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="rowCheckbox" value="@user.Id" />
+                    </td>
+                    <td>
+                        <strong>@user.Name</strong><br />
+                        <small class="text-muted">@user.Role</small>
+                    </td>
+                    <td>@user.Email</td>
+                    <td>
+                        @if (!user.isActive)
+                        {
+                            <span class="badge bg-danger">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">No</span>
+                        }
+                    </td>
+                    <td data-order="@user.LastSeen.Ticks">
+                        <span title="@user.LastSeen.ToString("f")">@user.LastSeen</span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+@section Scripts {
+    <script>
+        // Inicializar DataTable
+        $(document).ready(function () {
+            $('#userTable').DataTable({
+                order: [[4, 'desc']], // Ordenar por la columna "Last seen"
+                columnDefs: [
+                    { orderable: false, targets: 0 } // No ordenar la columna de checkboxes
+                ]
+            });
+        });
+
+        // Select all checkboxes
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checked = this.checked;
+            document.querySelectorAll(".rowCheckbox").forEach(cb => cb.checked = checked);
+        });
+
+        function getSelectedIds() {
+            return Array.from(document.querySelectorAll(".rowCheckbox:checked")).map(cb => cb.value);
+        }
+
+        function updateActiveUsers(isActive) {
+            const ids = getSelectedIds();
+            fetch("/Home/UpdateActiveUsers", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ Ids: ids, isActive: isActive })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error updating users");
+                location.reload();
+            })
+            .catch(error => console.error(error));
+        }
+
+        function deleteUsers() {
+            const ids = getSelectedIds();
+            fetch("/Home/DeleteUsers", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(ids)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error deleting users");
+                location.reload();
+            })
+            .catch(error => console.error(error));
+        }
+
+        document.getElementById("blockButton").addEventListener("click", () => updateActiveUsers(false));
+        document.getElementById("unblockButton").addEventListener("click", () => updateActiveUsers(true));
+        document.getElementById("deleteButton").addEventListener("click", () => deleteUsers());
+    </script>
+}

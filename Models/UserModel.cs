@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Task4.Models
 {
     public class UserModel
@@ -7,6 +9,8 @@ namespace Task4.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public int RoleId { get; set; }
+        public bool isActive { get; set; }
+        public DateTime LastSeen { get; set; }
         public virtual RoleModel Role { get; set; }
     }
 }

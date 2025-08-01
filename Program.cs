@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Task4.AppDbContext;
+using Task4.Middleware;
 using Task4.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,8 +12,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login/Index";
+        options.AccessDeniedPath = "/Login/Index";
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddControllersWithViews(config =>
+{
+    config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build()));
+});
 
 var app = builder.Build();
 
@@ -16,19 +34,19 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<Context>();
-    
+
     context.Database.EnsureCreated();
-    
+
     if (!context.Rols.Any())
     {
         var datoDummy = new RoleModel
         {
             Role = "Admin"
         };
-        
+
         context.Rols.Add(datoDummy);
         context.SaveChanges();
-        
+
         Console.WriteLine("Admin role created");
     }
 }
@@ -44,14 +62,15 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseMiddleware<ActiveOnlyMiddleware>();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Login}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
