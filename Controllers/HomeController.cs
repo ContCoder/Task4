@@ -67,7 +67,13 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties
+        {
+            ExpiresUtc = DateTime.UtcNow,
+            IsPersistent = false,
+            AllowRefresh = false
+        });
+
         return RedirectToAction("Index", "Home");
     }
 

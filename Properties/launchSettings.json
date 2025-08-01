@@ -1,23 +1,24 @@
-﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
+{
   "profiles": {
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5253",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5253"
     },
     "https": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7093;http://localhost:5253",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DefaultConnection": "workstation id=Task4DB.mssql.somee.com;packet size=4096;user id=ContCoder_SQLLogin_1;pwd=hnrgymzrnj;data source=Task4DB.mssql.somee.com;persist security info=False;initial catalog=Task4DB;TrustServerCertificate=True"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7093;http://localhost:5253"
     }
-  }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
 }

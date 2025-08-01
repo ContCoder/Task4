@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Task4.AppDbContext;
+using System.Security.Claims;
 
 namespace Task4.Middleware
 {
@@ -19,6 +20,7 @@ namespace Task4.Middleware
 
             if (path != null && (
                 path.StartsWith("/login") ||
+                path.StartsWith("/signin") ||
                 path.StartsWith("/css") ||
                 path.StartsWith("/js") ||
                 path.StartsWith("/lib") ||
@@ -29,21 +31,31 @@ namespace Task4.Middleware
                 return;
             }
 
-            if (context.User.Identity.IsAuthenticated)
+            if (!context.User.Identity.IsAuthenticated)
             {
-                var email = context.User.Identity.Name;
-                var usuario = dbContext.Users.FirstOrDefault(u => u.Email == email && u.isActive);
+                await _next(context);
+                return;
+            }
 
-                if (usuario == null)
+            var email = context.User.FindFirst(ClaimTypes.Email)?.Value;
+            var usuario = dbContext.Users.FirstOrDefault(u => u.Email == email && u.isActive);
+
+            if (usuario == null)
+            {
+                await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, new AuthenticationProperties
                 {
-                    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    context.Response.Redirect("/Login");
-                    return;
-                }
+                    ExpiresUtc = DateTime.UtcNow,
+                    IsPersistent = false,
+                    AllowRefresh = false
+                });
+
+                context.Response.Redirect("/Login/Index");
+                return;
             }
 
             await _next(context);
         }
+
 
     }
 }
